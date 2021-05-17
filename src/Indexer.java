@@ -24,6 +24,7 @@ public class Indexer {
         HashMap<String, ArrayList<String>> dictionary = new HashMap<>();
 
         buildIndex(pathToDirections, dictionary);
+        printIndexByWord("BBC", dictionary);
         System.out.println("check");//for debugging
     }
 
@@ -66,7 +67,7 @@ public class Indexer {
 
                                 for (String word : words) {
                                     dictionary.computeIfAbsent(word, k -> new ArrayList<String>())
-                                            .add(dir.getParent() + "\\" + dir.getName() + "\\" + path.getName());
+                                            .add(dir.getParent() + "\\" + dir.getName() + "\\" + item.getName());
                                 }
                             }
                         } catch (IOException ex) {
@@ -77,5 +78,13 @@ public class Indexer {
             }
             numberOfPath++;
         }
+    }
+
+    static void printIndexByWord(String word, HashMap<String, ArrayList<String>> dictionary) {
+        ArrayList<String> array = null;
+        if (dictionary.containsKey(word))
+            array = dictionary.get(word);
+        for (String search : array)
+            System.out.println(search);
     }
 }
