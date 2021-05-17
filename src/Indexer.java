@@ -1,3 +1,4 @@
+import java.io.File;
 
 public class Indexer {
 
@@ -13,8 +14,9 @@ public class Indexer {
 
     public static void main(String[] args) {
         selectSizeOfData();
-
-
+        File[] pathToDirections = initFiles();
+        for(File item: pathToDirections)
+            System.out.println(item);
         System.out.println("check");//for debugging
     }
 
@@ -25,5 +27,13 @@ public class Indexer {
         }
     }
 
+    private static File[] initFiles() {
+        return new File[]{
+                new File("data//aclImdb//test//neg"),
+                new File("data//aclImdb//test//pos"),
+                new File("data//aclImdb//train//neg"),
+                new File("data//aclImdb//train//pos"),
+                new File("data//aclImdb//train//unsup")};
+    }
 
 }
