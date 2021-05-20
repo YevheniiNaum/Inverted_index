@@ -4,7 +4,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Indexer {
 
@@ -25,7 +26,9 @@ public class Indexer {
         HashMap<String, ArrayList<String>> dictionary = new HashMap<>();
 
         buildIndex(pathToDirections, dictionary);
-        printIndexByWord("BBC", dictionary);
+        printIndexByWord("is", dictionary);
+        //printIndexBySentence("what is", dictionary);
+        //searchFiles("what is", dictionary);
         System.out.println("check");//for debugging
     }
 
@@ -72,6 +75,10 @@ public class Indexer {
                                 for (String word : words) {
                                     dictionary.computeIfAbsent(word, k -> new ArrayList<String>())
                                             .add(dir.getParent() + "\\" + dir.getName() + "\\" + item.getName());
+                                    Set<String> set = new HashSet<>(dictionary.get(word));//удаление дубликатов
+                                    dictionary.get(word).clear();
+                                    dictionary.get(word).addAll(set);
+
                                 }
                             }
                         } catch (IOException ex) {
@@ -85,23 +92,21 @@ public class Indexer {
     }
 
     static void printIndexByWord(String word, HashMap<String, ArrayList<String>> dictionary) {
+        System.out.println("BY WORD");
         ArrayList<String> array = null;
         word = word.toLowerCase();
         String[] words = word.split("\\s*(\\s|,|!|_|\\.)\\s*");
+
         for(String s: words)
             System.out.println(s);
 
-//        for(int i =0; i<words.length; i++){
-//            if(dictionary.containsKey(words[i])){
-//                array
-//            }
-//        }
         if (dictionary.containsKey(word)){
             array = dictionary.get(word);
         }
 
         //assert array != null;
         if(array!=null){
+            System.out.println(array.size());
             for (String search : array)
                 System.out.println(search);
         }
