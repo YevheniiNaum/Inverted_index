@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class Indexer {
 
@@ -60,7 +61,10 @@ public class Indexer {
                         try (BufferedReader bufReader = new BufferedReader(new FileReader(item))) {
                             String line;
                             while ((line = bufReader.readLine()) != null) {
-                                line = line.replaceAll("<br /><br />", "");
+                                line = line.toLowerCase();
+                                line = line
+                                        .replaceAll("[\\[\\](){}]", "")
+                                        .replaceAll("<br /><br />", "");
 
 
                                 String[] words = line.split("\\s*(\\s|,|!|_|\\.)\\s*");
@@ -82,9 +86,28 @@ public class Indexer {
 
     static void printIndexByWord(String word, HashMap<String, ArrayList<String>> dictionary) {
         ArrayList<String> array = null;
-        if (dictionary.containsKey(word))
+        word = word.toLowerCase();
+        String[] words = word.split("\\s*(\\s|,|!|_|\\.)\\s*");
+        for(String s: words)
+            System.out.println(s);
+
+//        for(int i =0; i<words.length; i++){
+//            if(dictionary.containsKey(words[i])){
+//                array
+//            }
+//        }
+        if (dictionary.containsKey(word)){
             array = dictionary.get(word);
-        for (String search : array)
-            System.out.println(search);
+        }
+
+        //assert array != null;
+        if(array!=null){
+            for (String search : array)
+                System.out.println(search);
+        }
+        else{
+            System.out.println("EMPTY!!");
+        }
+
     }
 }
