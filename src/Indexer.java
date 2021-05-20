@@ -18,12 +18,18 @@ public class Indexer {
 
     public static void main(String[] args) {
         selectSizeOfData();
-        File[] pathToDirections = initFiles();
 
+        File[] pathToDirections = initFiles();
+        File fileStopWords = new File("stopWords.txt");
+
+        ArrayList<String> stopWords = new ArrayList<>();
         HashMap<String, ArrayList<String>> dictionary = new HashMap<>();
 
+        initStopWords(fileStopWords, stopWords);
         buildIndex(pathToDirections, dictionary);
-        searchFiles("i love films", dictionary);
+        searchFiles("i love films", dictionary, stopWords);
+        System.out.println("CHECKING");
+        searchFiles("me", dictionary, stopWords);
         System.out.println("check");//for debugging
     }
 
@@ -41,6 +47,17 @@ public class Indexer {
                 new File("data//aclImdb//train//neg"),
                 new File("data//aclImdb//train//pos"),
                 new File("data//aclImdb//train//unsup")};
+    }
+
+    static void initStopWords(File file, ArrayList<String> arr) {
+        try (BufferedReader bufReader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = bufReader.readLine()) != null) {
+                arr.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void buildIndex(File[] paths, HashMap<String, ArrayList<String>> dictionary) {
@@ -87,29 +104,45 @@ public class Indexer {
     }
 
 
-    private static void searchFiles(String sentence, HashMap<String, ArrayList<String>> dictionary) {
+    private static void searchFiles(String sentence, HashMap<String, ArrayList<String>> dictionary, ArrayList<String> stopWords) {
         sentence = sentence
                 .replaceAll("[^A-Za-z0-9']", " ")
                 .toLowerCase();
 
         String[] words = sentence.split("\\s*(\\s|,|!|_|\\.)\\s*");
-
-
-        Set<String> token = new HashSet<>(dictionary.get(words[0]));//добавляем файлы первого элемента в набор
-        //с помощью специальной функции retainAll() делаем пересечение каждого из множеств
-        for (String word : words) {
-            Set<String> tempSet = new HashSet<>(dictionary.get(word));
-            token.retainAll(tempSet);
+        Set<String> firstToken = null;
+        //добавляем файлы первового элемента, который не в стоп-словах в набор
+        for(String word: words){
+            if(!stopWords.contains(word)){
+                firstToken = new HashSet<>(dictionary.get(word));
+            }
         }
 
-        //output
-        ArrayList<String> result = new ArrayList<>(token);
-        for (String s : words) {
-            System.out.print(s + " ");
+
+        if(firstToken!=null){
+            //с помощью специальной функции retainAll() делаем пересечение каждого из множеств
+            for (String word : words) {
+                if (stopWords.contains(word)) continue;
+                Set<String> tempSet = new HashSet<>(dictionary.get(word));
+                firstToken.retainAll(tempSet);
+            }
+
+
+            //output
+            ArrayList<String> result = new ArrayList<>(firstToken);
+            for (String s : words) {
+                System.out.print(s + " ");
+            }
+            System.out.println();
+            for (String s : result) {
+                System.out.println(s);
+            }
+        }else{
+            for (String s : words) {
+                System.out.print(s + " ");
+            }
+            System.out.println("\nEMPTY!!\nMaybe it was a stop word!");
         }
-        System.out.println();
-        for (String s : result) {
-            System.out.println(s);
-        }
+
     }
 }
