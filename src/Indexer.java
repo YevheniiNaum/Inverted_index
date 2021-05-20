@@ -2,10 +2,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Indexer {
 
@@ -26,9 +23,7 @@ public class Indexer {
         HashMap<String, ArrayList<String>> dictionary = new HashMap<>();
 
         buildIndex(pathToDirections, dictionary);
-        printIndexByWord("is", dictionary);
-        //printIndexBySentence("what is", dictionary);
-        //searchFiles("what is", dictionary);
+        searchFiles("i love films", dictionary);
         System.out.println("check");//for debugging
     }
 
@@ -66,11 +61,8 @@ public class Indexer {
                             while ((line = bufReader.readLine()) != null) {
                                 line = line.toLowerCase();
                                 line = line
-//                                        .replaceAll("[\\[\\](){}\\\\\\/\\\\.\\;]", "")
-//                                        .replaceAll("\\.", " ")
                                         .replaceAll("<br /><br />", "")
                                         .replaceAll("[^A-Za-z0-9]", " ");
-
 
 
                                 String[] words = line.split("\\s*(\\s|,|!|_|\\.)\\s*");
@@ -94,28 +86,30 @@ public class Indexer {
         }
     }
 
-    static void printIndexByWord(String word, HashMap<String, ArrayList<String>> dictionary) {
-        System.out.println("BY WORD");
-        ArrayList<String> array = null;
-        word = word.toLowerCase();
-        String[] words = word.split("\\s*(\\s|,|!|_|\\.)\\s*");
 
-        for(String s: words)
+    private static void searchFiles(String sentence, HashMap<String, ArrayList<String>> dictionary) {
+        sentence = sentence
+                .replaceAll("[^A-Za-z0-9']", " ")
+                .toLowerCase();
+
+        String[] words = sentence.split("\\s*(\\s|,|!|_|\\.)\\s*");
+
+
+        Set<String> token = new HashSet<>(dictionary.get(words[0]));//добавляем файлы первого элемента в набор
+        //с помощью специальной функции retainAll() делаем пересечение каждого из множеств
+        for (String word : words) {
+            Set<String> tempSet = new HashSet<>(dictionary.get(word));
+            token.retainAll(tempSet);
+        }
+
+        //output
+        ArrayList<String> result = new ArrayList<>(token);
+        for (String s : words) {
+            System.out.print(s + " ");
+        }
+        System.out.println();
+        for (String s : result) {
             System.out.println(s);
-
-        if (dictionary.containsKey(word)){
-            array = dictionary.get(word);
         }
-
-        //assert array != null;
-        if(array!=null){
-            System.out.println(array.size());
-            for (String search : array)
-                System.out.println(search);
-        }
-        else{
-            System.out.println("EMPTY!!");
-        }
-
     }
 }
