@@ -66,8 +66,11 @@ public class Indexer {
                             while ((line = bufReader.readLine()) != null) {
                                 line = line.toLowerCase();
                                 line = line
-                                        .replaceAll("[\\[\\](){}]", "")
-                                        .replaceAll("<br /><br />", "");
+//                                        .replaceAll("[\\[\\](){}\\\\\\/\\\\.\\;]", "")
+//                                        .replaceAll("\\.", " ")
+                                        .replaceAll("<br /><br />", "")
+                                        .replaceAll("[^A-Za-z0-9]", " ");
+
 
 
                                 String[] words = line.split("\\s*(\\s|,|!|_|\\.)\\s*");
