@@ -7,17 +7,17 @@ import java.util.*;
 public class Indexer {
 
     /*Size of files*/
-    private static final int[] N = {12500, 12500, 12500, 12500, 50000};
+    //private static final int[] N = {12500, 12500, 12500, 12500, 50000};
     /*Number of variable*/
-    private static final int V = 20;
+    //private static final int V = 20;
     /*start and end of required files*/
-    private static final int[] startIndex = new int[N.length];
-    private static final int[] endIndex = new int[N.length];
+    //private static final int[] startIndex = new int[N.length];
+    //private static final int[] endIndex = new int[N.length];
 
     /*Path to main directories*/
 
     public static void main(String[] args) {
-        selectSizeOfData();
+        //selectSizeOfData();
 
         File[] pathToDirections = initFiles();
         File fileStopWords = new File("stopWords.txt");
@@ -33,12 +33,12 @@ public class Indexer {
         System.out.println("check");//for debugging
     }
 
-    private static void selectSizeOfData() {
-        for (int i = 0; i < Indexer.N.length; i++) {
-            Indexer.startIndex[i] = Indexer.N[i] / 50 * (Indexer.V - 1);
-            Indexer.endIndex[i] = Indexer.N[i] / 50 * Indexer.V;
-        }
-    }
+//    private static void selectSizeOfData() {
+//        for (int i = 0; i < Indexer.N.length; i++) {
+//            Indexer.startIndex[i] = Indexer.N[i] / 50 * (Indexer.V - 1);
+//            Indexer.endIndex[i] = Indexer.N[i] / 50 * Indexer.V;
+//        }
+//    }
 
     private static File[] initFiles() {
         return new File[]{
@@ -71,8 +71,8 @@ public class Indexer {
 
                     String fileName = item.getName();
 
-                    if (Integer.parseInt(fileName.replaceAll("_+\\d+.txt", "")) >= startIndex[numberOfPath]
-                            && Integer.parseInt(fileName.replaceAll("_+\\d+.txt", "")) < endIndex[numberOfPath]) {
+//                    if (Integer.parseInt(fileName.replaceAll("_+\\d+.txt", "")) >= startIndex[numberOfPath]
+//                            && Integer.parseInt(fileName.replaceAll("_+\\d+.txt", "")) < endIndex[numberOfPath]) {
                         try (BufferedReader bufReader = new BufferedReader(new FileReader(item))) {
                             String line;
                             while ((line = bufReader.readLine()) != null) {
@@ -96,7 +96,7 @@ public class Indexer {
                         } catch (IOException ex) {
                             System.out.println(ex.getMessage());
                         }
-                    }
+//                    }
                 }
             }
             numberOfPath++;
@@ -131,9 +131,15 @@ public class Indexer {
             //output
             ArrayList<String> result = new ArrayList<>(firstToken);
             for (String s : words) {
-                System.out.print(s + " ");
+                    System.out.print(s + " ");
             }
             System.out.println();
+            for (String s : words) {
+                if(!stopWords.contains(s)){
+                    System.out.print(s + " ");
+                }
+            }
+            System.out.println(" (without stop words)\n");
             for (String s : result) {
                 System.out.println(s);
             }
