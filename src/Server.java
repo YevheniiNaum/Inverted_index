@@ -6,12 +6,9 @@ import java.util.LinkedList;
 public class Server{
     public static final int PORT = 9090;
     public static ServerSocket serverSocket;
-    private static Socket clientSocket; // сокет для общения
-    private static BufferedReader messageRequest; // поток для чтения с консоли
-    private static BufferedReader reader; // поток чтения из сокета
-    private static BufferedWriter writer; // поток записи в сокет
+    private static Socket clientSocket; // socket for speaking
 
-    public static LinkedList<ServerSomthing> serverList = new LinkedList<>(); // список всех нитей
+    public static LinkedList<OneClientClass> serverList = new LinkedList<>(); // список всех нитей
 
     public static void main(String[] args) throws IOException, InterruptedException {
         ServerSocket server = new ServerSocket(PORT);
@@ -19,13 +16,14 @@ public class Server{
         Indexer indexer = new Indexer();
         try {
             while (true) {
-                // Блокируется до возникновения нового соединения:
+                // Blocked until a new connection is established
                 Socket socket = server.accept();
                 try {
-                    serverList.add(new ServerSomthing(socket, indexer)); // добавить новое соединенние в список
+                    // add a new connection to the list
+                    serverList.add(new OneClientClass(socket, indexer));
                 } catch (IOException e) {
-                    // Если завершится неудачей, закрывается сокет,
-                    // в противном случае, нить закроет его при завершении работы:
+                    // If it fails, close the socket,
+                    // otherwise, the thread will close it on exit:
                     socket.close();
                     clientSocket.close();
                 }

@@ -2,22 +2,22 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-class ServerSomthing extends Thread {
+class OneClientClass extends Thread {
 
     // кроме него - клиент и сервер никак не связаны
     private Socket socket;
     private Indexer indexer;
-    private BufferedReader reader; // поток чтения из сокета
-    private BufferedWriter writer; // поток записи в сокет
+    private static BufferedReader reader; // stream of reading from socket
+    private static BufferedWriter writer; // stream of writing socket
 
-    public ServerSomthing(Socket socket, Indexer indexer) throws IOException {
+
+    public OneClientClass(Socket socket, Indexer indexer) throws IOException {
         this.socket= socket;
         this.indexer = indexer;
-        // сокет, через который сервер общается с клиентом,
-        // если потоку ввода/вывода приведут к генерированию исключения, оно проброситься дальше
+
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        start(); // вызываем run()
+        start(); // init run()
     }
 
     @Override
@@ -34,8 +34,10 @@ class ServerSomthing extends Thread {
                     System.out.println("REQUEST FROM USER: " + messageRequest);
                     ArrayList<String> response = indexer.searchFiles(messageRequest);
                     if(response!=null){
-                        sendMess(Integer.toString(response.size()));//отправляем размерность
-                        for(String s: response){//отправляем по-элементно
+                        // send dimension
+                        sendMess(Integer.toString(response.size()));
+                        // send element-by-element
+                        for(String s: response){
                             sendMess(s);
                         }
                     }
@@ -44,7 +46,7 @@ class ServerSomthing extends Thread {
         } catch (IOException ignored) {
         }
     }
-
+    //a function for sending a message to client
     private void sendMess(String msg) {
         try {
             writer.write(msg + "\n");
