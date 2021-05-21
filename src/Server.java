@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.LinkedList;
 
 public class Server{
     public static final int PORT = 9090;
@@ -10,39 +11,29 @@ public class Server{
     private static BufferedReader reader; // поток чтения из сокета
     private static BufferedWriter writer; // поток записи в сокет
 
-    public static void main(String[] args) {
-        try{
-            serverSocket = new ServerSocket(PORT);
-            System.out.println("Started");
-            Indexer indexer = new Indexer();
-            while(true){
-                clientSocket =serverSocket.accept();
-                try{
-                    reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+    public static LinkedList<ServerSomthing> serverList = new LinkedList<>(); // список всех нитей
 
-                    try{
-                        writer.write("You connected to server!" + "\n");
-                        writer.flush();
-                    }catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    while (true) { // постоянно смотрим на входящие данные с сервера и если они есть, выводим
-                        String messageRequest = reader.readLine();
-                        if (messageRequest!= null) {
-                            System.out.println("REQUEST FROM USER: " + messageRequest);
-                            //searchRequest(request);
-                        }
-                    }
-
-                }catch (IOException e) {
-                    System.out.println(e);
+    public static void main(String[] args) throws IOException, InterruptedException {
+        ServerSocket server = new ServerSocket(PORT);
+        System.out.println("Started");
+        Indexer indexer = new Indexer();
+        try {
+            while (true) {
+                // Блокируется до возникновения нового соединения:
+                Socket socket = server.accept();
+                try {
+                    serverList.add(new ServerSomthing(socket, indexer)); // добавить новое соединенние в список
+                } catch (IOException e) {
+                    // Если завершится неудачей, закрывается сокет,
+                    // в противном случае, нить закроет его при завершении работы:
+                    socket.close();
                     clientSocket.close();
                 }
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            server.close();
         }
     }
 }

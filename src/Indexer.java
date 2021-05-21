@@ -8,16 +8,15 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Indexer {
 
-    private static final int NUMBER_THREADS = 10;
+    private static final int NUMBER_THREADS = 4;
     public static ArrayList<File> allFiles = new ArrayList<File>();
 
     public static ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> invertedIndex = new ConcurrentHashMap<>();
+    public static ArrayList<String> stopWords = new ArrayList<>();
 
     public Indexer() throws InterruptedException {
         File[] pathToDirections = initFolders();
         File fileStopWords = new File("stopWords.txt");
-
-        ArrayList<String> stopWords = new ArrayList<>();
 
         initStopWords(fileStopWords, stopWords);
         initAllFiles(pathToDirections);
@@ -27,23 +26,19 @@ public class Indexer {
         double startTime, finalTime;
         startTime = System.nanoTime();
         parallelBuildIndex(pathToDirections, invertedIndex);
-        finalTime = (System.nanoTime() - startTime) / 1000000;
-        System.out.println("Finished building the index\nTime of building: " + finalTime + "\n");
+        finalTime = (System.nanoTime() - startTime) / 1000000000;
+        System.out.println("Finished building the index\nTime of building: " + finalTime + " seconds\n");
 
-
+//        startTime = System.nanoTime();
 //        buildIndex(pathToDirections, invertedIndex);
-
+//        finalTime = (System.nanoTime() - startTime) / 1000000;
+//        System.out.println("Finished building the index\nTime of building: " + finalTime + "\n");
 
         //searchFiles("i love films", invertedIndex, stopWords);
         //searchFiles("me", invertedIndex, stopWords);
         //searchFiles("will never care who lives or dies", invertedIndex, stopWords);
         //System.out.println("check");//for debugging
     }
-
-//    public static void main(String[] args) throws InterruptedException {
-//
-//
-//    }
 
     private static File[] initFolders() {
         return new File[]{
@@ -125,7 +120,7 @@ public class Indexer {
 
     }
 
-    private static void searchFiles(String sentence, ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> invertedIndex, ArrayList<String> stopWords) {
+    public  ArrayList<String> searchFiles(String sentence) {
         sentence = sentence
                 .replaceAll("[^A-Za-z0-9']", " ")
                 .toLowerCase();
@@ -139,7 +134,7 @@ public class Indexer {
             }
         }
 
-
+        ArrayList<String> result = null;
         if (firstToken != null) {
             //с помощью специальной функции retainAll() делаем пересечение каждого из множеств
             for (String word : words) {
@@ -149,26 +144,25 @@ public class Indexer {
             }
 
             //output
-            ArrayList<String> result = new ArrayList<>(firstToken);
-            for (String s : words) {
-                System.out.print(s + " ");
-            }
-            System.out.println();
-            for (String s : words) {
-                if (!stopWords.contains(s)) {
-                    System.out.print(s + " ");
-                }
-            }
-            System.out.println(" (without stop words)\n");
-            for (String s : result) {
-                System.out.println(s);
-            }
-        } else {
-            for (String s : words) {
-                System.out.print(s + " ");
-            }
-            System.out.println("\nEMPTY!!\nMaybe it was a stop word!");
-        }
+            result = new ArrayList<>(firstToken);
+//            for (String s : words) {
+//                System.out.print(s + " ");
+//            }
+//            System.out.println();
+//            for (String s : words) {
+//                if (!stopWords.contains(s)) {
+//                    System.out.print(s + " ");
+//                }
+//            }
+//            System.out.println(" (without stop words)\n");
+//            for (String s : result) {
+//                System.out.println(s);
+//            }
 
+        } else {
+            result = new ArrayList<>();
+            result.add("EMPTY!!  (Maybe it was a stop word!)");
+        }
+        return result;
     }
 }
