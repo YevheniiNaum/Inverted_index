@@ -13,10 +13,8 @@ public class Indexer {
 
     public static ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> invertedIndex = new ConcurrentHashMap<>();
 
-
-    public static void main(String[] args) throws InterruptedException {
-
-        File[] pathToDirections = initFiles();
+    public Indexer() throws InterruptedException {
+        File[] pathToDirections = initFolders();
         File fileStopWords = new File("stopWords.txt");
 
         ArrayList<String> stopWords = new ArrayList<>();
@@ -24,17 +22,30 @@ public class Indexer {
         initStopWords(fileStopWords, stopWords);
         initAllFiles(pathToDirections);
 
+
+        System.out.println("Building an index");
+        double startTime, finalTime;
+        startTime = System.nanoTime();
         parallelBuildIndex(pathToDirections, invertedIndex);
+        finalTime = (System.nanoTime() - startTime) / 1000000;
+        System.out.println("Finished building the index\nTime of building: " + finalTime + "\n");
 
-//      buildIndex(pathToDirections, invertedIndex);
+
+//        buildIndex(pathToDirections, invertedIndex);
 
 
-        searchFiles("i love films", invertedIndex, stopWords);
-        searchFiles("me", invertedIndex, stopWords);
-        System.out.println("check");//for debugging
+        //searchFiles("i love films", invertedIndex, stopWords);
+        //searchFiles("me", invertedIndex, stopWords);
+        //searchFiles("will never care who lives or dies", invertedIndex, stopWords);
+        //System.out.println("check");//for debugging
     }
 
-    private static File[] initFiles() {
+//    public static void main(String[] args) throws InterruptedException {
+//
+//
+//    }
+
+    private static File[] initFolders() {
         return new File[]{
                 new File("data//aclImdb//test//neg"),
                 new File("data//aclImdb//test//pos"),
@@ -45,12 +56,9 @@ public class Indexer {
 
     private static void initAllFiles(File[] paths) {
         for (File path : paths) {
-            File dir = path;
-            if (dir.isDirectory()) {
-                File[] files = dir.listFiles();
-                for (File item : files) {
-                    allFiles.add(item);
-                }
+            if (path.isDirectory()) {
+                File[] files = path.listFiles();
+                allFiles.addAll(Arrays.asList(files));
             }
         }
     }
@@ -66,7 +74,7 @@ public class Indexer {
         }
     }
 
-    public static void buildIndex(File[] paths, ConcurrentHashMap<String,  ConcurrentLinkedQueue<String>> invertedIndex) {
+    public static void buildIndex(File[] paths, ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> invertedIndex) {
         for (File path : paths) {
             File dir = path;
 
@@ -101,7 +109,7 @@ public class Indexer {
         }
     }
 
-    public static void parallelBuildIndex(File[] paths, ConcurrentHashMap<String,  ConcurrentLinkedQueue<String>> invertedIndex) throws InterruptedException {
+    public static void parallelBuildIndex(File[] paths, ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> invertedIndex) throws InterruptedException {
         IndexBuilder[] thread = new IndexBuilder[NUMBER_THREADS];
 
         for (int i = 0; i < NUMBER_THREADS; i++) {//разбиваем на потоки
@@ -111,13 +119,13 @@ public class Indexer {
             thread[i].start();
         }
         //завершение потоков
-        for(int i=0;i< NUMBER_THREADS; i++){
+        for (int i = 0; i < NUMBER_THREADS; i++) {
             thread[i].join();
         }
 
     }
 
-    private static void searchFiles(String sentence, ConcurrentHashMap<String,  ConcurrentLinkedQueue<String>> invertedIndex, ArrayList<String> stopWords) {
+    private static void searchFiles(String sentence, ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> invertedIndex, ArrayList<String> stopWords) {
         sentence = sentence
                 .replaceAll("[^A-Za-z0-9']", " ")
                 .toLowerCase();
@@ -139,7 +147,6 @@ public class Indexer {
                 Set<String> tempSet = new HashSet<>(invertedIndex.get(word));
                 firstToken.retainAll(tempSet);
             }
-
 
             //output
             ArrayList<String> result = new ArrayList<>(firstToken);
