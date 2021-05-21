@@ -29,15 +29,6 @@ public class Indexer {
         finalTime = (System.nanoTime() - startTime) / 1000000000;
         System.out.println("Finished building the index\nTime of building: " + finalTime + " seconds\n");
 
-//        startTime = System.nanoTime();
-//        buildIndex(pathToDirections, invertedIndex);
-//        finalTime = (System.nanoTime() - startTime) / 1000000;
-//        System.out.println("Finished building the index\nTime of building: " + finalTime + "\n");
-
-        //searchFiles("i love films", invertedIndex, stopWords);
-        //searchFiles("me", invertedIndex, stopWords);
-        //searchFiles("will never care who lives or dies", invertedIndex, stopWords);
-        //System.out.println("check");//for debugging
     }
 
     private static File[] initFolders() {
@@ -69,41 +60,6 @@ public class Indexer {
         }
     }
 
-    public static void buildIndex(File[] paths, ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> invertedIndex) {
-        for (File path : paths) {
-            File dir = path;
-
-            if (dir.isDirectory()) {
-                File[] files = dir.listFiles();
-                for (File item : files) {
-                    try (BufferedReader br = new BufferedReader(new FileReader(item))) {
-                        String line;
-                        while ((line = br.readLine()) != null) {
-                            line = line.toLowerCase();
-                            line = line
-                                    .replaceAll("<br /><br />", "")
-                                    .replaceAll("[^A-Za-z0-9]", " ");
-
-
-                            String[] words = line.split("\\s*(\\s|,|!|_|\\.)\\s*");
-
-                            for (String word : words) {
-                                invertedIndex.computeIfAbsent(word, k -> new ConcurrentLinkedQueue<String>())
-                                        .add(dir.getParent() + "\\" + dir.getName() + "\\" + item.getName());
-                                Set<String> set = new HashSet<>(invertedIndex.get(word));//удаление дубликатов
-                                invertedIndex.get(word).clear();
-                                invertedIndex.get(word).addAll(set);
-
-                            }
-                        }
-                    } catch (IOException ex) {
-                        System.out.println(ex.getMessage());
-                    }
-                }
-            }
-        }
-    }
-
     public static void parallelBuildIndex(File[] paths, ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> invertedIndex) throws InterruptedException {
         IndexBuilder[] thread = new IndexBuilder[NUMBER_THREADS];
 
@@ -120,7 +76,7 @@ public class Indexer {
 
     }
 
-    public  ArrayList<String> searchFiles(String sentence) {
+    public ArrayList<String> searchFiles(String sentence) {
         sentence = sentence
                 .replaceAll("[^A-Za-z0-9']", " ")
                 .toLowerCase();
@@ -145,20 +101,6 @@ public class Indexer {
 
             //output
             result = new ArrayList<>(firstToken);
-//            for (String s : words) {
-//                System.out.print(s + " ");
-//            }
-//            System.out.println();
-//            for (String s : words) {
-//                if (!stopWords.contains(s)) {
-//                    System.out.print(s + " ");
-//                }
-//            }
-//            System.out.println(" (without stop words)\n");
-//            for (String s : result) {
-//                System.out.println(s);
-//            }
-
         } else {
             result = new ArrayList<>();
             result.add("EMPTY!!  (Maybe it was a stop word!)");
