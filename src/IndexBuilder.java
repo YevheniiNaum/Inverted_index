@@ -3,8 +3,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class IndexBuilder extends Thread {
     ArrayList<File> allFiles;
@@ -34,12 +36,14 @@ public class IndexBuilder extends Thread {
                     String[] words = line.split("\\s*(\\s|,|!|_|\\.)\\s*");
 
                     for (String word : words) {
-                        Indexer.invertedIndex.computeIfAbsent(word, k -> new ArrayList<String>())
+                        Indexer.invertedIndex.computeIfAbsent(word, k -> new ConcurrentLinkedQueue<String>())
                                 //.add(dir.getParent() + "\\" + dir.getName() + "\\" + item.getName())
                                 .add(String.valueOf(allFiles.get(i)));
-                        Set<String> set = new HashSet<>(Indexer.invertedIndex.get(word));//удаление дубликатов
+                        //удаление дубликатов
+                        Set<String> concurrentHashSet = new HashSet<>(Indexer.invertedIndex.get(word));
+
                         Indexer.invertedIndex.get(word).clear();
-                        Indexer.invertedIndex.get(word).addAll(set);
+                        Indexer.invertedIndex.get(word).addAll(concurrentHashSet);
 
                     }
                 }
