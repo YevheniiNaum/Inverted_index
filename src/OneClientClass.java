@@ -7,7 +7,7 @@ class OneClientClass extends Thread {
     // кроме него - клиент и сервер никак не связаны
     private Socket socket;
     private Indexer indexer;
-    private static BufferedReader reader; // stream of reading from socket
+    private static BufferedReader reader; // stream of reading f    rom socket
     private static BufferedWriter writer; // stream of writing socket
 
 

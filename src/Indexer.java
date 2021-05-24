@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Indexer {
     //Number of threads that will build indexes
-    private static final int NUMBER_THREADS = 4;
+    private static final int NUMBER_THREADS = 3;
 
     public static ArrayList<File> allFiles = new ArrayList<File>();
     //a map that stores a key-word and a value - an array of files that contain a word
@@ -18,7 +18,7 @@ public class Indexer {
 
     public Indexer() throws InterruptedException {
         File[] pathToDirections = initFolders();
-        File fileStopWords = new File("stopWords.txt");
+        File fileStopWords = new File("..\\..\\..\\stopWords.txt");
 
         initStopWords(fileStopWords, stopWords);
         initAllFiles(pathToDirections);
@@ -36,11 +36,11 @@ public class Indexer {
     //a function that returns an array of directories
     private static File[] initFolders() {
         return new File[]{
-                new File("data//aclImdb//test//neg"),
-                new File("data//aclImdb//test//pos"),
-                new File("data//aclImdb//train//neg"),
-                new File("data//aclImdb//train//pos"),
-                new File("data//aclImdb//train//unsup")};
+                new File("..\\..\\..\\data//aclImdb//test//neg"),
+                new File("..\\..\\..\\data//aclImdb//test//pos"),
+                new File("..\\..\\..\\data//aclImdb//train//neg"),
+                new File("..\\..\\..\\data//aclImdb//train//pos"),
+                new File("..\\..\\..\\data//aclImdb//train//unsup")};
     }
 
     //a function that puts all files into one array
