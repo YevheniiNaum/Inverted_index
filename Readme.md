@@ -19,6 +19,7 @@ git clone https://github.com/jeniknaum5/course_work_parallel_computing.git
 ```
 ### Pre setting:
 
+- Delete file ".gitkeep" in the "data" folder.
 - Place the folders with text data in the "Data" folder.
 - Open "src" folder  and open ***"Indexer"*** file using any text editor:
 - - In the constructor of the ***NUMBER_THREADS*** variable, set a number that is greater than or equal to 1 (This variable is responsible for the number of threads that will build the index) 
