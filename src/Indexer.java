@@ -94,11 +94,9 @@ public class Indexer {
 
         //add files of the first element that is not in the stop words to the set
         for (String word : words) {
-            if (!stopWords.contains(word)) {
-                if(invertedIndex.contains(word)){
-                    firstToken = new HashSet<>(invertedIndex.get(word));
-                    break;
-                }
+            if (!stopWords.contains(word) && invertedIndex.containsKey(word)) {
+                firstToken = new HashSet<>(invertedIndex.get(word));
+                break;
             }
         }
 
