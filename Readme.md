@@ -1,4 +1,4 @@
-# jeniknaum5/course_work_parallel_computing (Inverted Index)
+# jeniknaum5/Inverted Index
 
 ---
 ## The purpose of the course work
